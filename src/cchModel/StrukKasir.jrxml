@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7072ba5f-b49f-410e-b2f6-aab9d1eaf0af">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="158" splitType="Stretch">
+			<image>
+				<reportElement x="239" y="23" width="334" height="73" uuid="926cbf5f-33af-460d-b749-2a1faff15e13"/>
+				<imageExpression><![CDATA["C:\\Users\\Fathan\\OneDrive\\Pictures\\Saved Pictures\\24.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="239" y="107" width="100" height="20" uuid="8a3ce195-c84d-4ff1-aab8-3a73ea8a5bbe"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[caffe hotel 24]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="293" splitType="Stretch">
+			<staticText>
+				<reportElement x="44" y="29" width="100" height="20" uuid="cc7f9564-849a-4c1a-a315-0342c88e0397"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Thai Tea]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="69" width="149" height="20" uuid="c02f3c8e-bd66-496f-acf4-a7b26fa2ed83"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Thai Tea Dalgona]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="109" width="100" height="20" uuid="1316b0c5-967b-462b-ab09-78d203883a3d"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Dalgona]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="149" width="100" height="20" uuid="407f7c6f-6343-4c13-a5a2-1433cd6b7580"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Dimsum Kecil]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="189" width="100" height="20" uuid="f16c65f6-0207-4119-85d4-74b454f52f12"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Dimsum Besar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="49" width="31" height="20" uuid="cabb6c05-d598-42dc-8722-6ac6b6f7485c"/>
+				<textElement>
+					<font fontName="Consolas" size="12"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="49" width="22" height="20" uuid="d6fbda03-79bb-4797-90aa-b588c9099da2"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[x]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="49" width="100" height="20" uuid="20e984cf-569b-41ab-92b4-3d7c502c7231"/>
+				<textElement>
+					<font fontName="Consolas" size="12"/>
+				</textElement>
+				<text><![CDATA[5.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="89" width="31" height="20" uuid="321f8b65-5f1e-4bfd-a6ff-a2f62342586b"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="89" width="22" height="20" uuid="0cdd07d1-f4e8-4260-813f-4c6b80be86a2"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[x]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="89" width="100" height="20" uuid="6f76786e-8547-428d-be55-c475dba289d3"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[8.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="129" width="22" height="20" uuid="0a10d9fb-b520-48c5-81b6-64fe0666fab3"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[x]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="129" width="100" height="20" uuid="b8cca2b7-e54c-4794-b01a-b2afb931a1e5"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[10.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="129" width="31" height="20" uuid="44e0c21b-444d-47e2-9d3e-d3ca745a5c87"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="169" width="100" height="20" uuid="08ef5ab3-ec99-410a-9702-dde40a537b12"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[10.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="169" width="22" height="20" uuid="1a0c79d7-2cbf-414b-97a3-8ab896800da0"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[x]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="169" width="31" height="20" uuid="2f95ce65-b751-4966-bcd6-fe0640fa7cb4"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="209" width="100" height="20" uuid="8d3f3df7-71a8-48a1-a2a7-741b7b8ee5b0"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[15.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="209" width="31" height="20" uuid="7da79013-cabb-42c6-8e91-2173d94d212b"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="209" width="22" height="20" uuid="66887f0e-1930-4752-aba1-dd86f278315c"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[x]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="267" width="555" height="1" uuid="0b10318f-e116-4803-8aa2-239816b8ba41"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="377" y="29" width="100" height="20" uuid="9904c6eb-90ce-4426-a86f-c7685ee8958b"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[5.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="189" width="100" height="20" uuid="ac3c5c8c-8e6e-4a71-aaad-00b7cccc6d35"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[15.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="149" width="100" height="20" uuid="62e461e3-2881-480d-bcf9-b361f52acf9f"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[10.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="109" width="100" height="20" uuid="90869c4f-4cf2-48a3-9534-589bfc2744dc"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[10.000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="377" y="69" width="100" height="20" uuid="75285ba8-765f-4e0a-8920-66f91a415af7"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[8.000]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="249" splitType="Stretch">
+			<staticText>
+				<reportElement x="44" y="35" width="100" height="20" uuid="93c8ff55-9c37-4c16-b95e-ad4c18eb6030"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Administrator]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="55" width="100" height="20" uuid="dbaf927e-1fb2-4292-af10-f4557eafb415"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[No Telp]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="75" width="123" height="20" uuid="1017fcde-59c7-49e4-8ce5-1184a8ad2d12"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Nomer Orderan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="95" width="100" height="20" uuid="4b0ca834-8e77-478e-9c3d-7625cc8a40c6"/>
+				<textElement>
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="150" width="555" height="37" uuid="1835a8a8-203c-4d4e-b470-04a4151d402a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Consolas" size="14"/>
+				</textElement>
+				<text><![CDATA[Jl.Bambu Apus Raya No.95, RT.1/RW.3, Bambu Apus, Cipayung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13890]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
