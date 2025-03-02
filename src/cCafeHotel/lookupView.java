@@ -111,6 +111,12 @@ public class lookupView extends javax.swing.JFrame {
         CashierPage.menu3.setText(tblLookup.getValueAt(tblLookup.getSelectedRow(), 0).toString());
         CashierPage.hrgMenu3.setText(tblLookup.getValueAt(tblLookup.getSelectedRow(), 1).toString());
         break;
+    case "nmBarang":
+        // Logika untuk 
+        KichenPage.kdBarang.setText(tblLookup.getValueAt(tblLookup.getSelectedRow(), 0).toString());
+        KichenPage.nmBarang.setText(tblLookup.getValueAt(tblLookup.getSelectedRow(), 1).toString());
+        break;
+    
     default:
         System.out.println("Unknown lookup type: " + lblLookup.getText());
         break;

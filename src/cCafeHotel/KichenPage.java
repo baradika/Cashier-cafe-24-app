@@ -12,12 +12,16 @@ import static cCafeHotel.CashierPage.menu1;
 import static cCafeHotel.CashierPage.menu2;
 import static cCafeHotel.CashierPage.menu3;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import koneksi.koneksi;
 
 /**
@@ -34,7 +38,236 @@ public class KichenPage extends javax.swing.JFrame {
      */
     public KichenPage() {
         initComponents();
+        showTableBarang();
+        kdBarang.setEditable(false);
+        Look1.addActionListener(e -> showLookupDialog());
     }
+    
+    
+    private void showLookupDialog() {
+        try {
+            // Mendapatkan koneksi ke database
+            Connection conn = koneksi.getKoneksi();
+
+            // Query untuk mengambil data kasir
+            String sql = "SELECT namaBarang, harga, stokBarang FROM barang";
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            // Membuat model tabel untuk tampilan lookup
+            DefaultTableModel model = new DefaultTableModel(new String[]{"Nama Barang", "Harga", "Stok"}, 0);
+            while (resultSet.next()) {
+                model.addRow(new Object[]{
+                    resultSet.getString("namaBarang"),
+                    resultSet.getDouble("harga"),
+                    resultSet.getInt("stokBarang")
+                });
+            }
+
+            // Menampilkan dialog lookup
+            JTable tblLookup = new JTable(model);
+            JOptionPane.showMessageDialog(this, new JScrollPane(tblLookup), "Pilih Barang", JOptionPane.PLAIN_MESSAGE);
+
+            // Mendapatkan data dari baris yang dipilih
+            int selectedRow = tblLookup.getSelectedRow();
+            if (selectedRow != -3) {
+            // Ambil data dari tabel
+            String namaBarang = tblLookup.getValueAt(selectedRow, 0).toString();
+            String harga = tblLookup.getValueAt(selectedRow, 1).toString();
+            String stok = tblLookup.getValueAt(selectedRow, 2).toString();
+
+            nmBarang.setText(namaBarang);
+            HrgBrang.setText(harga);
+            stokBrang.setText(stok);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat memuat data barang: " + ex.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    private void showTableBarang() {
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("Kode Barang");
+    model.addColumn("Nama Barang");
+    model.addColumn("Stok");
+    model.addColumn("Harga");
+
+    try {
+        // Koneksi ke database
+        Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dbcafe24", "root", "");
+        String sql = "SELECT * FROM barang";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        // Mengisi data ke JTable
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getInt("kdBarang"),
+                rs.getString("namaBarang"),
+                rs.getInt("stokBarang"),
+                rs.getInt("harga")
+            });
+        }
+
+        // Set model ke JTable
+        tblKitchen.setModel(model);
+
+        // Tutup koneksi
+        rs.close();
+        stmt.close();
+        conn.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal menampilkan data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+    private void save() {
+    String namaBarang = nmBarang.getText();
+    String stokBarangStr = stokBrang.getText(); // stokBrang harus berupa JTextField
+    String hargaStr = HrgBrang.getText();
+
+    // Validasi input
+    if (namaBarang.isEmpty() || stokBarangStr.isEmpty() || hargaStr.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    try {
+        int stokBarang = Integer.parseInt(stokBarangStr); // Ubah teks ke int
+        int harga = Integer.parseInt(hargaStr); // Ubah teks ke int
+
+        // Koneksi ke database
+        String sql = "INSERT INTO barang (namaBarang, stokBarang, harga) VALUES (?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dbcafe24", "root", "");
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, namaBarang);
+            stmt.setInt(2, stokBarang);
+            stmt.setInt(3, harga);
+
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
+                nmBarang.setText("");   // Kosongkan input
+                stokBrang.setText("");  // Kosongkan input
+                HrgBrang.setText("");   // Kosongkan input
+            }
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Stok dan Harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Gagal menyimpan data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+    
+
+    private void delete() {
+    int selectedRow = tblKitchen.getSelectedRow(); // Ambil baris yang dipilih
+
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih data yang ingin dihapus!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin menghapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            int kdBarang = Integer.parseInt(tblKitchen.getValueAt(selectedRow, 0).toString()); // Ambil kdBarang dari tabel
+
+            // Koneksi ke database
+            String sql = "DELETE FROM barang WHERE kdBarang = ?";
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dbcafe24", "root", "");
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setInt(1, kdBarang);
+
+                int rowsDeleted = stmt.executeUpdate();
+                if (rowsDeleted > 0) {
+                    JOptionPane.showMessageDialog(this, "Data berhasil dihapus!");
+
+                    // Refresh tabel setelah menghapus data
+                    showTableBarang();
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Gagal menghapus data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+    
+    private void update() {
+    int selectedRow = tblKitchen.getSelectedRow(); // Ambil baris yang dipilih
+
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih data yang ingin diupdate!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    String namaBarang = nmBarang.getText();
+    String stokBarangStr = stokBrang.getText();
+    String hargaStr = HrgBrang.getText();
+
+    // Validasi input
+    if (namaBarang.isEmpty() || stokBarangStr.isEmpty() || hargaStr.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    try {
+        int stokBarang = Integer.parseInt(stokBarangStr);
+        int harga = Integer.parseInt(hargaStr);
+        int kdBarang = Integer.parseInt(tblKitchen.getValueAt(selectedRow, 0).toString()); // Ambil kdBarang dari tabel
+
+        // Konfirmasi update
+        int confirm = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin mengupdate data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Koneksi ke database
+            String sql = "UPDATE barang SET namaBarang = ?, stokBarang = ?, harga = ? WHERE kdBarang = ?";
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/dbcafe24", "root", "");
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, namaBarang);
+                stmt.setInt(2, stokBarang);
+                stmt.setInt(3, harga);
+                stmt.setInt(4, kdBarang);
+
+                int rowsUpdated = stmt.executeUpdate();
+                if (rowsUpdated > 0) {
+                    JOptionPane.showMessageDialog(this, "Data berhasil diupdate!");
+
+                    // Refresh tabel setelah update
+                    showTableBarang();
+
+                    // Kosongkan input field setelah update
+                    nmBarang.setText("");
+                    stokBrang.setText("");
+                    HrgBrang.setText("");
+                }
+            }
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Stok dan Harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Gagal mengupdate data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+    private void reset() {
+    nmBarang.setText("");   // Kosongkan field Nama Barang
+    stokBrang.setText("");  // Kosongkan field Stok Barang
+    HrgBrang.setText("");   // Kosongkan field Harga Barang
+}
+
+
+
+
+
     
 
     /**
@@ -52,17 +285,17 @@ public class KichenPage extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        Lookup = new javax.swing.JButton();
+        nmBarang = new javax.swing.JTextField();
+        kdBarang = new javax.swing.JTextField();
+        HrgBrang = new javax.swing.JTextField();
+        stokBrang = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabel = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        tblKitchen = new javax.swing.JTable();
+        save = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        Look1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,25 +330,13 @@ public class KichenPage extends javax.swing.JFrame {
 
         jLabel5.setText("Stok");
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        kdBarang.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                kdBarangActionPerformed(evt);
             }
         });
 
-        Lookup.setText("Lookup");
-        Lookup.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                LookupMouseClicked(evt);
-            }
-        });
-        Lookup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LookupActionPerformed(evt);
-            }
-        });
-
-        tabel.setModel(new javax.swing.table.DefaultTableModel(
+        tblKitchen.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -126,12 +347,17 @@ public class KichenPage extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tabel);
+        tblKitchen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblKitchenMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblKitchen);
 
-        jButton1.setText("SAVE");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        save.setText("SAVE");
+        save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                saveActionPerformed(evt);
             }
         });
 
@@ -143,6 +369,11 @@ public class KichenPage extends javax.swing.JFrame {
         });
 
         jButton3.setText("UPDATE");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("RESET");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -150,6 +381,8 @@ public class KichenPage extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
+
+        Look1.setText("LOOKUP");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -160,30 +393,32 @@ public class KichenPage extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(80, 80, 80)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(kdBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addGap(18, 18, 18)
-                                        .addComponent(jTextField1))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
-                                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addComponent(jLabel2))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(Lookup))))
+                                        .addComponent(nmBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(29, 29, 29)
+                                .addComponent(Look1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(HrgBrang, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(stokBrang, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(55, 55, 55))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(146, 146, 146)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(save, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(46, 46, 46)
                         .addComponent(jButton2)
                         .addGap(44, 44, 44)
@@ -197,28 +432,36 @@ public class KichenPage extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(8, 8, 8)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38)
+                .addGap(36, 36, 36)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(HrgBrang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addGap(31, 31, 31)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(stokBrang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(kdBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2))
+                                .addGap(28, 28, 28)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(nmBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3))
+                                .addGap(41, 41, 41))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(Look1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Lookup)
-                    .addComponent(jLabel3))
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addGap(31, 31, 31)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(47, 47, 47)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(save)
                     .addComponent(jButton2)
                     .addComponent(jButton3)
                     .addComponent(jButton4))
@@ -228,89 +471,42 @@ public class KichenPage extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void kdBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kdBarangActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_kdBarangActionPerformed
 
-    private void LookupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LookupActionPerformed
+    private void saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveActionPerformed
         // TODO add your handling code here:
-        showLookUpDialog("barang");
-    }//GEN-LAST:event_LookupActionPerformed
-
-    private void LookupMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LookupMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_LookupMouseClicked
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        try {
-    Connection conn = koneksi.getConnection();
-    conn.setAutoCommit(false);
-
-    // Ambil tanggal dari JDateChooser
-    java.util.Date utilDate = tglOrder.getDate(); // tglOrder adalah JDateChooser
-    if (utilDate == null) {
-        throw new SQLException("Tanggal pemesanan belum dipilih.");
-    }
-    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime()); // Mengubah ke java.sql.Date
-
-    // Simpan data pembelian
-    String sqlPembelian = "INSERT INTO pembelian (tglOrder, kasir) VALUES (?, ?)";
-    java.sql.PreparedStatement pstmtPembelian = conn.prepareStatement(sqlPembelian, java.sql.Statement.RETURN_GENERATED_KEYS);
-    pstmtPembelian.setDate(1, sqlDate); // Menggunakan sqlDate
-    pstmtPembelian.setString(2, idKasir.getText());
-    pstmtPembelian.executeUpdate();
-
-    java.sql.ResultSet generatedKeys = pstmtPembelian.getGeneratedKeys();
-    if (!generatedKeys.next()) {
-        throw new SQLException("Gagal mendapatkan ID pembelian.");
-    }
-    int idPembelian = generatedKeys.getInt(1);
-
-    // Simpan detail pembelian
-    String sqlDetail = "INSERT INTO detail_pembelian (idPembelian, kdBarang, jumlah, harga) VALUES (?, ?, ?, ?)";
-    java.sql.PreparedStatement pstmtDetail = conn.prepareStatement(sqlDetail);
-
-    for (int i = 0; i < 3; i++) {
-        String menu = i == 0 ? menu1.getText() : i == 1 ? menu2.getText() : menu3.getText();
-        String jumlah = i == 0 ? hrgMenu1.getText() : i == 1 ? hrgMenu2.getText() : hrgMenu3.getText();
-
-        if (!menu.isEmpty() && !jumlah.isEmpty()) {
-            pstmtDetail.setInt(1, idPembelian);
-            pstmtDetail.setString(2, menu); // Kode barang
-            pstmtDetail.setInt(3, Integer.parseInt(jumlah));
-            pstmtDetail.setDouble(4, Double.parseDouble(jumlah)); // Harga
-            pstmtDetail.addBatch();
-        }
-    }
-
-    pstmtDetail.executeBatch();
-    conn.commit();
-    javax.swing.JOptionPane.showMessageDialog(this, "Transaksi berhasil disimpan!");
-    } catch (Exception ex) {
-        ex.printStackTrace();
-    }
-    }//GEN-LAST:event_jButton1ActionPerformed
+      save();
+      showTableBarang();
+    }//GEN-LAST:event_saveActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        int selectedRow = tblpesanan.getSelectedRow();
-    if (selectedRow != -1) {
-        ((javax.swing.table.DefaultTableModel) tblpesanan.getModel()).removeRow(selectedRow);
-        javax.swing.JOptionPane.showMessageDialog(this, "Baris berhasil dihapus!");
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
-    }
+        //int selectedRow = tblpesanan.getSelectedRow();
+   // if (selectedRow != -1) {
+      //  ((javax.swing.table.DefaultTableModel) tblpesanan.getModel()).removeRow(selectedRow);
+       // javax.swing.JOptionPane.showMessageDialog(this, "Baris berhasil dihapus!");
+    //} else {
+       // javax.swing.JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
+   // }
+   delete();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-        jTextField1.setText("");
-        jTextField2.setText("");
-        jTextField3.setText("");
-        jTextField4.setText("");
-        
+        reset();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void tblKitchenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKitchenMouseClicked
+        // TODO add your handling code here:
+       
+    }//GEN-LAST:event_tblKitchenMouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        update();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -348,8 +544,8 @@ public class KichenPage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Lookup;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JTextField HrgBrang;
+    private javax.swing.JButton Look1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -360,10 +556,10 @@ public class KichenPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTable tabel;
+    public static javax.swing.JTextField kdBarang;
+    public static javax.swing.JTextField nmBarang;
+    private javax.swing.JButton save;
+    private javax.swing.JTextField stokBrang;
+    private javax.swing.JTable tblKitchen;
     // End of variables declaration//GEN-END:variables
 }
